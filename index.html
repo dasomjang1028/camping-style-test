@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>나의 캠핑 스타일은?</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #F5F5DC 0%, #FDF5E6 50%, #FAF0E6 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        h1 {
+            color: #2E7D32;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        .main-image {
+            font-size: 100px;
+            margin: 30px 0;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.2em;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #4CAF50, #8BC34A);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 1.1em;
+            cursor: pointer;
+            margin: 10px;
+            transition: transform 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #FF7043, #FF8A65);
+        }
+
+        .btn-share {
+            background: linear-gradient(135deg, #2196F3, #42A5F5);
+        }
+
+        .progress-bar {
+            background: #e0e0e0;
+            height: 8px;
+            border-radius: 4px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress {
+            background: linear-gradient(90deg, #4CAF50, #8BC34A);
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .question-counter {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .question {
+            font-size: 1.3em;
+            color: #333;
+            margin-bottom: 30px;
+            font-weight: 500;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .option {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+
+        .option:hover {
+            border-color: #4CAF50;
+            transform: translateY(-2px);
+        }
+
+        .result-emoji {
+            font-size: 100px;
+            margin: 20px 0;
+        }
+
+        .result-title {
+            color: #2E7D32;
+            font-size: 2em;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+
+        .result-subtitle {
+            color: #4CAF50;
+            font-size: 1.3em;
+            margin-bottom: 20px;
+        }
+
+        .result-description {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            text-align: left;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .coupon-section {
+            background: linear-gradient(135deg, #FFD54F, #FFEB3B);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 2px dashed #FFA000;
+        }
+
+        .coupon-title {
+            color: #F57C00;
+            font-size: 1.4em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #4CAF50;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .alert {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            font-size: 0.9em;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+            h1 {
+                font-size: 2em;
+            }
+            .main-image {
+                font-size: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 메인 화면 -->
+        <div id="main" class="section active">
+            <h1>나의 캠핑 스타일은?</h1>
+            <div class="main-image">🏕️</div>
+            <p class="subtitle">
+                당신만의 특별한 캠핑 스타일을 발견해보세요!<br>
+                12개의 간단한 질문으로 알아보는 나만의 캠핑 성향
+            </p>
+            <button class="btn" onclick="startTest()">테스트 시작하기</button>
+        </div>
+
+        <!-- 질문 화면 -->
+        <div id="question" class="section">
+            <div class="question-counter">
+                <span id="current-q">1</span> / 12
+            </div>
+            <div class="progress-bar">
+                <div class="progress" id="progress"></div>
+            </div>
+            <h2 class="question" id="question-text"></h2>
+            <div class="options" id="options"></div>
+        </div>
+
+        <!-- 결과 화면 -->
+        <div id="result" class="section">
+            <h2>당신의 캠핑 스타일은</h2>
+            <div class="result-emoji" id="result-emoji"></div>
+            <div class="result-title" id="result-title"></div>
+            <div class="result-subtitle" id="result-subtitle"></div>
+            <div class="result-description" id="result-description"></div>
+            
+            <div class="coupon-section">
+                <div class="coupon-title">🎁 특별 할인 쿠폰!</div>
+                <p>테스트 완료 기념 20% 할인쿠폰을 받아가세요!</p>
+                <button class="btn btn-secondary" id="coupon-btn" onclick="getCoupon()">쿠폰 받기</button>
+                <div id="coupon-result"></div>
+            </div>
+            
+            <div>
+                <button class="btn btn-share" onclick="shareResult()">결과 공유하기</button>
+                <button class="btn" onclick="restartTest()">다시 테스트</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 데이터 수집 설정
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyDopdosuclXbULpnq-0edVaZC3pRCzTBkO6_txAEI9uuoLWWtBBD8CC7mPCp6Pcj754Q/exec'; // Apps Script 웹앱 URL
+        const USE_GOOGLE_SHEETS = true; // 구글 시트 사용 여부
+        
+        // 백엔드 서버 API 설정 (옵션)
+        const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+            ? 'http://localhost:3001' // 로컬 개발 환경
+            : 'https://your-production-domain.com'; // 프로덕션 환경 (배포 후 실제 URL로 변경)
+        
+        const questions = [
+            {
+                q: "캠핑을 계획할 때 나는...",
+                a: [
+                    { text: "미리 상세한 일정을 짜고 준비물을 체크리스트로 만든다", type: "J" },
+                    { text: "대략적인 계획만 세우고 즉흥적으로 즐긴다", type: "P" }
+                ]
+            },
+            {
+                q: "캠핑장에서 새로운 사람들을 만나면...",
+                a: [
+                    { text: "먼저 다가가서 인사하고 대화를 시작한다", type: "E" },
+                    { text: "상대방이 먼저 말을 걸어오기를 기다린다", type: "I" }
+                ]
+            },
+            {
+                q: "캠핑 요리를 할 때 나는...",
+                a: [
+                    { text: "레시피를 정확히 따라하며 계량도 정확히 한다", type: "S" },
+                    { text: "대충 감으로 하면서 창의적으로 변형한다", type: "N" }
+                ]
+            },
+            {
+                q: "캠핑 장비를 선택할 때 가장 중요한 것은...",
+                a: [
+                    { text: "기능성과 실용성, 가성비", type: "T" },
+                    { text: "디자인과 느낌, 캠핑 분위기", type: "F" }
+                ]
+            },
+            {
+                q: "텐트를 칠 때 나는...",
+                a: [
+                    { text: "설명서를 꼼꼼히 읽고 순서대로 설치한다", type: "J" },
+                    { text: "일단 해보면서 감으로 설치한다", type: "P" }
+                ]
+            },
+            {
+                q: "캠핑에서 가장 좋은 시간은...",
+                a: [
+                    { text: "모든 사람들과 함께 모닥불 앞에서 이야기하는 시간", type: "E" },
+                    { text: "혼자서 자연을 바라보며 생각에 잠기는 시간", type: "I" }
+                ]
+            },
+            {
+                q: "캠핑지를 선택할 때 나는...",
+                a: [
+                    { text: "시설이 잘 갖춰진 검증된 캠핑장을 선택한다", type: "S" },
+                    { text: "아무도 가보지 않은 숨겨진 장소를 찾아간다", type: "N" }
+                ]
+            },
+            {
+                q: "캠핑에서 문제가 생겼을 때 나는...",
+                a: [
+                    { text: "논리적으로 원인을 분석하고 해결책을 찾는다", type: "T" },
+                    { text: "팀원들의 기분을 먼저 살피고 분위기를 맞춘다", type: "F" }
+                ]
+            },
+            {
+                q: "캠핑 일정을 짤 때 나는...",
+                a: [
+                    { text: "시간별로 상세한 스케줄을 만든다", type: "J" },
+                    { text: "그때그때 하고 싶은 것을 한다", type: "P" }
+                ]
+            },
+            {
+                q: "캠핑에서 에너지를 얻는 순간은...",
+                a: [
+                    { text: "다른 캠퍼들과 활발하게 소통할 때", type: "E" },
+                    { text: "조용한 자연 속에서 혼자만의 시간을 가질 때", type: "I" }
+                ]
+            },
+            {
+                q: "캠핑 장비를 정리할 때 나는...",
+                a: [
+                    { text: "사용한 순서대로 체계적으로 정리한다", type: "S" },
+                    { text: "대략적으로 분류해서 넣는다", type: "N" }
+                ]
+            },
+            {
+                q: "캠핑 후기를 남길 때 나는...",
+                a: [
+                    { text: "객관적인 정보와 팁을 상세히 기록한다", type: "T" },
+                    { text: "감정과 느낌을 중심으로 따뜻하게 작성한다", type: "F" }
+                ]
+            }
+        ];
+
+        const results = {
+            'ESTJ': { title: '완벽주의 리더 캠퍼', subtitle: '모든 것을 완벽하게 준비하는 캠핑 대장', emoji: '👑', description: '당신은 캠핑의 모든 것을 계획하고 실행하는 타고난 리더입니다. 체크리스트를 만들어 빠짐없이 준비하고, 팀원들의 안전과 편의를 책임집니다.' },
+            'ESTP': { title: '즉흥적 모험가', subtitle: '지금 이 순간을 즐기는 액션 캠퍼', emoji: '🔥', description: '당신은 계획보다는 즉흥성을 중시하는 모험가입니다. 새로운 장소와 액티비티에 도전하기를 좋아하며, 캠핑장에서 가장 활동적입니다.' },
+            'ESFJ': { title: '따뜻한 케어테이커', subtitle: '모두를 챙기는 마음 따뜻한 캠퍼', emoji: '🤗', description: '당신은 캠핑에서 모든 사람들이 편안하고 즐겁게 지낼 수 있도록 세심하게 배려합니다. 맛있는 캠핑 요리를 준비하고 팀원들을 돌봅니다.' },
+            'ESFP': { title: '자유로운 분위기 메이커', subtitle: '캠핑장을 축제로 만드는 즐거운 캠퍼', emoji: '🎪', description: '당신은 캠핑을 하나의 큰 축제로 만드는 재능이 있습니다. 자유롭고 유연한 성격으로 어떤 상황에도 잘 적응합니다.' },
+            'ENTJ': { title: '전략적 캠핑 마스터', subtitle: '효율성을 추구하는 캠핑 전략가', emoji: '⚡', description: '당신은 캠핑을 하나의 프로젝트로 접근하는 전략가입니다. 목표를 설정하고 최적의 방법으로 달성하려 합니다.' },
+            'ENTP': { title: '창의적 실험가', subtitle: '새로운 캠핑 스타일을 개척하는 혁신가', emoji: '💡', description: '당신은 기존의 캠핑 방식에 얽매이지 않고 새로운 방법을 시도하는 혁신가입니다.' },
+            'ENFJ': { title: '영감을 주는 가이드', subtitle: '모두에게 영감을 주는 캠핑 멘토', emoji: '🌟', description: '당신은 캠핑을 통해 사람들에게 영감과 깨달음을 주는 멘토입니다. 자연과의 교감을 중시합니다.' },
+            'ENFP': { title: '열정적 탐험가', subtitle: '무한한 가능성을 꿈꾸는 자유로운 영혼', emoji: '🦋', description: '당신은 캠핑에서 무한한 가능성을 발견하는 자유로운 영혼입니다. 새로운 사람들과의 만남을 소중히 여깁니다.' },
+            'ISTJ': { title: '신중한 전통주의자', subtitle: '검증된 방법으로 안전한 캠핑을 즐기는 신뢰할 수 있는 캠퍼', emoji: '🛡️', description: '당신은 검증된 방법과 전통적인 캠핑 스타일을 선호합니다. 철저한 준비와 계획으로 안전한 캠핑을 만듭니다.' },
+            'ISTP': { title: '실용적 기술자', subtitle: '뛰어난 손기술로 모든 것을 해결하는 캠핑 장인', emoji: '🔧', description: '당신은 실용적이고 기술적인 접근으로 캠핑의 달인이 됩니다. 장비를 능숙하게 다룹니다.' },
+            'ISFJ': { title: '조용한 수호자', subtitle: '묵묵히 모든 것을 챙기는 든든한 지원군', emoji: '🕊️', description: '당신은 다른 사람들이 편안하게 캠핑할 수 있도록 조용히 뒷바라지하는 수호자입니다.' },
+            'ISFP': { title: '감성적 예술가', subtitle: '자연과 하나 되는 순수한 마음의 캠퍼', emoji: '🎨', description: '당신은 자연의 아름다움을 온몸으로 느끼며 캠핑하는 예술가입니다. 조용한 자연 속에서 내면의 평화를 찾습니다.' },
+            'INTJ': { title: '완벽주의 설계자', subtitle: '이상적인 캠핑을 설계하는 전략적 사고가', emoji: '🏗️', description: '당신은 완벽한 캠핑 시스템을 설계하고 구현하는 설계자입니다. 효율성과 품질을 모두 추구합니다.' },
+            'INTP': { title: '분석적 탐구자', subtitle: '캠핑의 원리를 탐구하는 사색가', emoji: '🔬', description: '당신은 캠핑의 모든 요소를 분석하고 이해하려는 탐구자입니다. 논리적이고 체계적인 접근을 합니다.' },
+            'INFJ': { title: '신비로운 몽상가', subtitle: '자연과 깊은 교감을 나누는 영적 탐험가', emoji: '🌙', description: '당신은 캠핑을 통해 자연과 깊은 영적 교감을 나누는 몽상가입니다. 혼자만의 시간을 소중히 여깁니다.' },
+            'INFP': { title: '이상주의 시인', subtitle: '자연에서 영감을 받는 순수한 이상주의자', emoji: '📝', description: '당신은 자연에서 영감을 받아 내면의 이상을 추구하는 시인입니다. 개인적인 가치와 의미를 중시합니다.' }
+        };
+
+        let currentQuestion = 0;
+        let answers = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
+        let userResponses = [];
+
+        // 구글 시트 데이터 전송 함수들
+        async function saveTestResultToGoogleSheet(resultData) {
+            if (!USE_GOOGLE_SHEETS || !GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes('여기에_')) {
+                console.log('구글 시트 미설정 - 로컬 저장으로 전환');
+                saveTestResultLocally(resultData);
+                return { success: false, error: '구글 시트 미설정' };
+            }
+
+            try {
+                const response = await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'save_test_result',
+                        ...resultData,
+                        ip_address: await getClientIP()
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('구글 시트 응답 오류');
+                }
+                
+                const result = await response.json();
+                console.log('구글 시트에 저장 완료:', result);
+                return result;
+            } catch (error) {
+                console.error('구글 시트 저장 실패:', error);
+                // 구글 시트 저장 실패 시 로컬 저장으로 폴백
+                saveTestResultLocally(resultData);
+                return { success: false, error: error.message };
+            }
+        }
+
+        // 백엔드 서버 API 호출 함수 (기존)
+        async function saveTestResultToServer(resultData) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/camping/test-result`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(resultData)
+                });
+                
+                if (!response.ok) {
+                    throw new Error('서버 응답 오류');
+                }
+                
+                const result = await response.json();
+                console.log('서버에 저장 완료:', result);
+                return result;
+            } catch (error) {
+                console.error('서버 저장 실패:', error);
+                return { success: false, error: error.message };
+            }
+        }
+
+        // 구글 시트 쿠폰 발급
+        async function issueCouponFromGoogleSheet(resultType) {
+            if (!USE_GOOGLE_SHEETS || !GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes('여기에_')) {
+                return generateLocalCoupon(resultType);
+            }
+
+            try {
+                const response = await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'issue_coupon',
+                        result_type: resultType,
+                        user_agent: navigator.userAgent,
+                        ip_address: await getClientIP()
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('구글 시트 응답 오류');
+                }
+                
+                const result = await response.json();
+                console.log('구글 시트 쿠폰 발급 완료:', result);
+                return result;
+            } catch (error) {
+                console.error('구글 시트 쿠폰 발급 실패:', error);
+                return generateLocalCoupon(resultType);
+            }
+        }
+
+        // 백엔드 서버 쿠폰 발급 (기존)
+        async function issueCouponFromServer(resultType) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/camping/issue-coupon`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        result_type: resultType,
+                        user_agent: navigator.userAgent
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('서버 응답 오류');
+                }
+                
+                const result = await response.json();
+                return result;
+            } catch (error) {
+                console.error('서버 쿠폰 발급 실패:', error);
+                return generateLocalCoupon(resultType);
+            }
+        }
+
+        // 로컬 쿠폰 생성
+        function generateLocalCoupon(resultType) {
+            return {
+                success: true,
+                data: {
+                    coupon_code: `CAMPING${Math.random().toString(36).substr(2, 8).toUpperCase()}`,
+                    result_type: resultType,
+                    timestamp: new Date().toISOString()
+                },
+                message: '쿠폰이 발급되었습니다! (로컬)',
+                fallback: true
+            };
+        }
+
+        // IP 주소 가져오기 (간단한 방법)
+        async function getClientIP() {
+            try {
+                const response = await fetch('https://api.ipify.org?format=json');
+                const data = await response.json();
+                return data.ip;
+            } catch (error) {
+                console.log('IP 조회 실패:', error);
+                return 'unknown';
+            }
+        }
+
+        // 로컬 저장 함수 (서버 실패 시 백업)
+        function saveTestResultLocally(resultData) {
+            let localData = JSON.parse(localStorage.getItem('campingTestData') || '[]');
+            localData.push(resultData);
+            localStorage.setItem('campingTestData', JSON.stringify(localData));
+            console.log('로컬에 저장됨:', resultData);
+        }
+
+        function startTest() {
+            document.getElementById('main').classList.remove('active');
+            document.getElementById('question').classList.add('active');
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const question = questions[currentQuestion];
+            document.getElementById('current-q').textContent = currentQuestion + 1;
+            document.getElementById('progress').style.width = ((currentQuestion + 1) / questions.length * 100) + '%';
+            document.getElementById('question-text').textContent = question.q;
+            
+            const optionsDiv = document.getElementById('options');
+            optionsDiv.innerHTML = '';
+            
+            question.a.forEach((answer) => {
+                const option = document.createElement('div');
+                option.className = 'option';
+                option.textContent = answer.text;
+                option.onclick = () => selectAnswer(answer.type, answer.text);
+                optionsDiv.appendChild(option);
+            });
+        }
+
+        function selectAnswer(type, text) {
+            answers[type]++;
+            userResponses.push({
+                question: questions[currentQuestion].q,
+                answer: text,
+                type: type
+            });
+            
+            currentQuestion++;
+            
+            if (currentQuestion < questions.length) {
+                setTimeout(showQuestion, 300);
+            } else {
+                setTimeout(showResult, 300);
+            }
+        }
+
+        function calculateResult() {
+            let result = '';
+            result += answers.E > answers.I ? 'E' : 'I';
+            result += answers.S > answers.N ? 'S' : 'N';
+            result += answers.T > answers.F ? 'T' : 'F';
+            result += answers.J > answers.P ? 'J' : 'P';
+            return result;
+        }
+
+        async function showResult() {
+            const resultType = calculateResult();
+            const result = results[resultType];
+            
+            document.getElementById('question').classList.remove('active');
+            document.getElementById('result').classList.add('active');
+            
+            document.getElementById('result-emoji').textContent = result.emoji;
+            document.getElementById('result-title').textContent = result.title;
+            document.getElementById('result-subtitle').textContent = result.subtitle;
+            document.getElementById('result-description').textContent = result.description;
+            
+            // 데이터 저장 (구글 시트 우선, 실패 시 서버/로컬)
+            const resultData = {
+                result_type: resultType,
+                result_title: result.title,
+                responses: userResponses,
+                user_agent: navigator.userAgent,
+                referrer: document.referrer,
+                timestamp: new Date().toISOString()
+            };
+            
+            // 구글 시트 -> 서버 -> 로컬 순으로 시도
+            if (USE_GOOGLE_SHEETS) {
+                await saveTestResultToGoogleSheet(resultData);
+            } else {
+                const serverResult = await saveTestResultToServer(resultData);
+                if (!serverResult.success) {
+                    saveTestResultLocally(resultData);
+                }
+            }
+        }
+
+        async function getCoupon() {
+            const couponBtn = document.getElementById('coupon-btn');
+            const couponResult = document.getElementById('coupon-result');
+            
+            // 버튼 비활성화 및 로딩 표시
+            couponBtn.disabled = true;
+            couponBtn.innerHTML = '쿠폰 발급 중<span class="loading"></span>';
+            
+            try {
+                const resultType = calculateResult();
+                
+                // 구글 시트 우선, 실패 시 서버/로컬
+                const couponData = USE_GOOGLE_SHEETS 
+                    ? await issueCouponFromGoogleSheet(resultType)
+                    : await issueCouponFromServer(resultType);
+                
+                if (couponData.success) {
+                    couponResult.innerHTML = `
+                        <div class="alert alert-success">
+                            🎉 ${couponData.message}<br>
+                            <strong>쿠폰코드: ${couponData.data.coupon_code}</strong><br>
+                            <small>* 캠핑용품 쇼핑몰에서 사용하세요</small>
+                        </div>
+                    `;
+                    couponBtn.style.display = 'none';
+                } else {
+                    throw new Error(couponData.error || '쿠폰 발급 실패');
+                }
+            } catch (error) {
+                couponResult.innerHTML = `
+                    <div class="alert alert-error">
+                        ❌ 쿠폰 발급에 실패했습니다.<br>
+                        <small>${error.message}</small>
+                    </div>
+                `;
+                couponBtn.disabled = false;
+                couponBtn.innerHTML = '다시 시도';
+            }
+        }
+
+        function shareResult() {
+            const resultType = calculateResult();
+            const result = results[resultType];
+            const shareText = `나의 캠핑 스타일: ${result.title}\n${result.subtitle}\n\n테스트 해보기: ${window.location.href}`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: '나의 캠핑 스타일 테스트',
+                    text: shareText
+                });
+            } else {
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(shareText);
+                    alert('결과가 클립보드에 복사되었습니다!');
+                } else {
+                    alert('공유하기: ' + shareText);
+                }
+            }
+        }
+
+        function restartTest() {
+            currentQuestion = 0;
+            answers = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
+            userResponses = [];
+            
+            document.getElementById('result').classList.remove('active');
+            document.getElementById('main').classList.add('active');
+            
+            // 쿠폰 섹션 초기화
+            document.getElementById('coupon-btn').disabled = false;
+            document.getElementById('coupon-btn').innerHTML = '쿠폰 받기';
+            document.getElementById('coupon-btn').style.display = 'inline-block';
+            document.getElementById('coupon-result').innerHTML = '';
+        }
+
+        // 개발자용 데이터 조회 함수
+        function getCampingTestData() {
+            console.log('로컬 저장 데이터:', JSON.parse(localStorage.getItem('campingTestData') || '[]'));
+            
+            // 구글 시트 통계 조회
+            if (USE_GOOGLE_SHEETS && GOOGLE_SCRIPT_URL && !GOOGLE_SCRIPT_URL.includes('여기에_')) {
+                fetch(`${GOOGLE_SCRIPT_URL}?action=stats`)
+                    .then(res => res.json())
+                    .then(data => {
+                        console.log('📊 구글 시트 통계 데이터:', data);
+                        console.log('🔗 구글 시트 확인:', GOOGLE_SCRIPT_URL.replace('/exec', '/edit'));
+                    })
+                    .catch(error => {
+                        console.log('구글 시트 통계 조회 실패:', error.message);
+                    });
+            } else {
+                // 서버 통계 조회 (서버가 구축된 경우)
+                fetch(`${API_BASE_URL}/api/camping/stats`)
+                    .then(res => res.json())
+                    .then(data => {
+                        console.log('서버 통계 데이터:', data);
+                    })
+                    .catch(error => {
+                        console.log('서버 통계 조회 실패:', error.message);
+                    });
+            }
+            
+            return {
+                localData: JSON.parse(localStorage.getItem('campingTestData') || '[]'),
+                note: USE_GOOGLE_SHEETS ? '구글 시트 데이터는 콘솔 또는 시트에서 확인하세요' : '서버 데이터는 콘솔에서 확인하세요'
+            };
+        }
+
+        // 연결 테스트
+        async function testConnections() {
+            console.log('🔍 연결 상태 확인 중...');
+            
+            // 구글 시트 연결 테스트
+            if (USE_GOOGLE_SHEETS && GOOGLE_SCRIPT_URL && !GOOGLE_SCRIPT_URL.includes('여기에_')) {
+                try {
+                    const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=stats`);
+                    if (response.ok) {
+                        console.log('✅ 구글 시트 연결 성공');
+                        const data = await response.json();
+                        console.log('📊 현재 구글 시트 통계:', data.data);
+                        return true;
+                    } else {
+                        console.log('❌ 구글 시트 연결 실패 - HTTP ' + response.status);
+                    }
+                } catch (error) {
+                    console.log('❌ 구글 시트 연결 실패:', error.message);
+                }
+            } else {
+                console.log('⚙️ 구글 시트 미설정 - URL을 설정해주세요');
+            }
+            
+            // 백엔드 서버 연결 테스트
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/camping/stats`);
+                if (response.ok) {
+                    console.log('✅ 백엔드 서버 연결 성공');
+                    return true;
+                } else {
+                    console.log('❌ 백엔드 서버 연결 실패 - HTTP ' + response.status);
+                }
+            } catch (error) {
+                console.log('❌ 백엔드 서버 연결 실패:', error.message);
+            }
+            
+            console.log('💡 로컬 모드로 동작합니다');
+            return false;
+        }
+
+        // 기존 함수명 호환성 유지
+        const testServerConnection = testConnections;
+
+        // 페이지 로드 시 연결 테스트
+        window.addEventListener('load', () => {
+            testConnections();
+        });
+    </script>
+</body>
+</html>
