@@ -880,7 +880,7 @@
     <script>
         // Google Sheets 연동 설정
         const SHEETS_CONFIG = {
-            url: 'https://script.google.com/macros/s/AKfycbxUE9yhVwuvoA37nz4DV6QEIjgzVGvZJ--xFc7C8xkpTl2xBBuFtNxwxYDx09Zcs_aE/exec',
+            url: 'https://script.google.com/macros/s/AKfycbyLGPbfeBxTukA6XR8z2oiJ0yasbczvPvN8DkGP0XYurNXNpRvW79W5flrYtkSI46m5/exec',
             testSheet: '테스트결과',
             couponSheet: '쿠폰발급'
         };
@@ -1031,7 +1031,6 @@
             try {
                 const response = await fetch(SHEETS_CONFIG.url, {
                     method: 'POST',
-                    mode: 'no-cors',
                     headers: {
                         'Content-Type': 'application/json',
                     },
@@ -1041,9 +1040,15 @@
                     })
                 });
 
-                updateSheetsStatus('connected', '시트 연결됨');
-                console.log('Google Sheets에 데이터 저장 완료');
-                return true;
+                const result = await response.json();
+                
+                if (result.success) {
+                    updateSheetsStatus('connected', '시트 연결됨');
+                    console.log('Google Sheets에 데이터 저장 완료:', result.message);
+                    return result;
+                } else {
+                    throw new Error(result.error || '알 수 없는 오류');
+                }
             } catch (error) {
                 console.error('Google Sheets 저장 실패:', error);
                 updateSheetsStatus('error', '시트 연결 실패');
@@ -1225,39 +1230,42 @@
                     user_agent: navigator.userAgent
                 };
                 
-                const response = await fetch(SHEETS_CONFIG.url, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        action: 'issue_coupon',
-                        ...couponData
-                    })
-                });
+                const result = await sendToGoogleSheets(couponData, 'coupon');
                 
-                // 쿠폰 코드 생성 (서버에서 생성되지만 여기서도 표시용으로)
-                const couponCode = `CAMPING${Math.random().toString(36).substr(2, 8).toUpperCase()}`;
-                
-                couponResult.innerHTML = `
-                    <div class="alert alert-success">
-                        🎉 쿠폰이 발급되었습니다!<br>
-                        <strong>쿠폰코드: ${couponCode}</strong><br>
-                        <small>* 캠핑용품 쇼핑몰에서 사용하세요</small>
-                    </div>
-                `;
-                couponBtn.style.display = 'none';
+                if (result && result.success) {
+                    const couponCode = result.data?.coupon_code || `CAMPING${Math.random().toString(36).substr(2, 8).toUpperCase()}`;
+                    
+                    couponResult.innerHTML = `
+                        <div class="alert alert-success">
+                            🎉 쿠폰이 발급되었습니다!<br>
+                            <strong>쿠폰코드: ${couponCode}</strong><br>
+                            <small>* 캠핑용품 쇼핑몰에서 사용하세요</small>
+                        </div>
+                    `;
+                    couponBtn.style.display = 'none';
+                } else {
+                    throw new Error(result?.message || '쿠폰 발급 실패');
+                }
                 
             } catch (error) {
                 console.error('쿠폰 발급 실패:', error);
                 couponResult.innerHTML = `
                     <div class="alert alert-error">
-                        쿠폰 발급에 실패했습니다. 다시 시도해주세요.
+                        쿠폰 발급에 실패했습니다. 다시 시도해주세요.<br>
+                        <small>오류: ${error.message}</small>
                     </div>
                 `;
                 couponBtn.disabled = false;
-                couponBtn.innerHTML = '할인받기';
+                couponBtn.innerHTML = `
+                    <div class="coupon-content">
+                        <div class="coupon-icon">🏕️</div>
+                        <div class="coupon-text">
+                            <div class="coupon-label">캠핑 장비 할인</div>
+                            <div class="coupon-value">최대 34,000원 쿠폰할인</div>
+                        </div>
+                    </div>
+                    <div class="coupon-download">↓</div>
+                `;
             }
         }
 
@@ -1373,17 +1381,29 @@
         }
 
         // 초기 연결 테스트
-        window.addEventListener('load', () => {
+        window.addEventListener('load', async () => {
             updateSheetsStatus('', '시트 연결 확인 중...');
             
             // Google Sheets 연결 테스트
-            setTimeout(() => {
-                if (SHEETS_CONFIG.url.includes('https://script.google.com/macros/s/AKfycbxUE9yhVwuvoA37nz4DV6QEIjgzVGvZJ--xFc7C8xkpTl2xBBuFtNxwxYDx09Zcs_aE/exec')) {
-                    updateSheetsStatus('error', 'Google Apps Script URL 설정 필요');
+            try {
+                const response = await fetch(SHEETS_CONFIG.url + '?action=ping', {
+                    method: 'GET'
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.status === 'success') {
+                        updateSheetsStatus('connected', '시트 연결 완료 ✓');
+                    } else {
+                        updateSheetsStatus('connected', '시트 연결 준비됨');
+                    }
                 } else {
-                    updateSheetsStatus('connected', '시트 연결 준비됨');
+                    updateSheetsStatus('error', '시트 연결 확인 필요');
                 }
-            }, 1000);
+            } catch (error) {
+                console.log('연결 테스트 실패:', error);
+                updateSheetsStatus('connected', '시트 연결 준비됨');
+            }
         });
 
         // 개발자용 데이터 조회 함수
@@ -1404,6 +1424,3 @@
     </script>
 </body>
 </html>
-
-
-
