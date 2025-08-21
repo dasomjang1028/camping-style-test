@@ -585,6 +585,62 @@
             max-width: 400px;
         }
 
+        .question-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            height: 40px;
+        }
+
+        .back-button {
+            background: #F3F4F6;
+            border: 1px solid #E5E7EB;
+            color: #6B7280;
+            font-size: 18px;
+            font-weight: 500;
+            padding: 0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            flex-shrink: 0;
+        }
+
+        .back-button:hover {
+            background: #E5E7EB;
+            border-color: #D1D5DB;
+            color: #4B5563;
+        }
+
+        .back-button:active {
+            transform: translateY(1px);
+        }
+
+        .question-counter {
+            flex: 1;
+            text-align: center;
+            color: #6B7280;
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 40px;
+        }
+
+        .question-spacer {
+            width: 40px;
+            height: 40px;
+            flex-shrink: 0;
+        }
+
         @media (max-width: 768px) {
             .container {
                 padding: 24px 16px;
@@ -644,6 +700,23 @@
             .footer-content {
                 font-size: 12px;
             }
+            .question-header {
+                height: 32px;
+                margin-bottom: 16px;
+            }
+            .back-button {
+                width: 32px;
+                height: 32px;
+                font-size: 16px;
+            }
+            .question-counter {
+                height: 32px;
+                font-size: 13px;
+            }
+            .question-spacer {
+                width: 32px;
+                height: 32px;
+            }
         }
 
         .footer {
@@ -675,10 +748,16 @@
             <button class="btn btn-primary" onclick="startTest()">테스트 시작하기</button>
         </div>
 
-        <!-- 질문 화면 -->
+                <!-- 질문 화면 -->
         <div id="question" class="section">
-            <div class="question-counter">
-                <span id="current-q">1</span> / 14
+            <div class="question-header">
+                <button class="back-button" id="back-btn" onclick="goBack()">
+                    <span>←</span>
+                </button>
+                <div class="question-counter">
+                    <span id="current-q">1</span> / 14
+                </div>
+                <div class="question-spacer"></div>
             </div>
             <div class="progress-bar">
                 <div class="progress" id="progress"></div>
@@ -883,6 +962,7 @@
         let currentQuestion = 0;
         let answers = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
         let userResponses = [];
+        let answerHistory = []; // 뒤로가기를 위한 답변 히스토리
         let testStartTime = null;
         let additionalData = {
             frequency: '',
@@ -923,10 +1003,40 @@
 
         function startTest() {
             testStartTime = new Date();
+            currentQuestion = 0;
+            answers = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
+            userResponses = [];
+            answerHistory = [];
+            additionalData = { frequency: '', companion: '' };
+            
             document.getElementById('main').classList.remove('active');
             document.getElementById('question').classList.add('active');
             showQuestion();
         }
+
+        function goBack() {
+            if (currentQuestion === 0) {
+                // 첫 번째 질문에서는 메인으로 돌아가기
+                document.getElementById('question').classList.remove('active');
+                document.getElementById('main').classList.add('active');
+                return;
+            }
+            
+            // 이전 질문으로 돌아가기
+            currentQuestion--;
+            
+            // 이전 답변 복원
+            if (answerHistory.length > 0) {
+                const prevState = answerHistory.pop();
+                answers = { ...prevState.answers };
+                additionalData = { ...prevState.additionalData };
+                userResponses.pop();
+            }
+            
+            showQuestion();
+        }
+
+
 
         function showQuestion() {
             const question = questions[currentQuestion];
@@ -947,6 +1057,12 @@
         }
 
         function selectAnswer(type, text, value) {
+            // 현재 상태를 히스토리에 저장 (뒤로가기를 위해)
+            answerHistory.push({
+                answers: { ...answers },
+                additionalData: { ...additionalData }
+            });
+            
             if (type === 'FREQUENCY') {
                 additionalData.frequency = value;
             } else if (type === 'COMPANION') {
