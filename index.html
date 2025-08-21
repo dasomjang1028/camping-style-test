@@ -880,7 +880,7 @@
     <script>
         // Google Sheets 연동 설정
         const SHEETS_CONFIG = {
-            url: 'https://script.google.com/macros/s/AKfycbw4WpNApUXvxngTByr-kdq3W8YrOFf3Ezyp4_M56bsx2a-FeB8CS4Dpe-SAvvy6YV5NOw/exec',
+            url: 'https://script.google.com/macros/s/AKfycbxUE9yhVwuvoA37nz4DV6QEIjgzVGvZJ--xFc7C8xkpTl2xBBuFtNxwxYDx09Zcs_aE/exec',
             testSheet: '테스트결과',
             couponSheet: '쿠폰발급'
         };
@@ -1378,7 +1378,7 @@
             
             // Google Sheets 연결 테스트
             setTimeout(() => {
-                if (SHEETS_CONFIG.url.includes('https://script.google.com/macros/s/AKfycbw4WpNApUXvxngTByr-kdq3W8YrOFf3Ezyp4_M56bsx2a-FeB8CS4Dpe-SAvvy6YV5NOw/exec')) {
+                if (SHEETS_CONFIG.url.includes('https://script.google.com/macros/s/AKfycbxUE9yhVwuvoA37nz4DV6QEIjgzVGvZJ--xFc7C8xkpTl2xBBuFtNxwxYDx09Zcs_aE/exec')) {
                     updateSheetsStatus('error', 'Google Apps Script URL 설정 필요');
                 } else {
                     updateSheetsStatus('connected', '시트 연결 준비됨');
@@ -1404,5 +1404,6 @@
     </script>
 </body>
 </html>
+
 
 
