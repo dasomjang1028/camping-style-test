@@ -729,6 +729,33 @@
             line-height: 1.5;
             letter-spacing: -0.005em;
         }
+
+        .share-container {
+            background: linear-gradient(135deg, #F5F5DC 0%, #FDF5E6 50%, #FAF0E6 100%);
+            padding: 32px;
+            border-radius: 20px;
+            max-width: 400px;
+            margin: 0 auto;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .share-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .share-title {
+            color: #2E7D32;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .share-subtitle {
+            color: #6B7280;
+            font-size: 14px;
+            font-weight: 400;
+        }
     </style>
 </head>
 <body>
@@ -746,7 +773,7 @@
             <button class="btn btn-primary" onclick="startTest()">테스트 시작하기</button>
         </div>
 
-                <!-- 질문 화면 -->
+        <!-- 질문 화면 -->
         <div id="question" class="section">
             <div class="question-header">
                 <button class="back-button" id="back-btn" onclick="goBack()">
@@ -774,61 +801,78 @@
                 <div class="result-title" id="result-title"></div>
                 <div class="result-subtitle" id="result-subtitle"></div>
                 <div class="result-description" id="result-description"></div>
-            </div>
-            
+        </div>
+
             <div class="stats-section">
                 <div class="stats-title">📊 캠핑 성향 분석</div>
                 <div class="stats-content">
                     <div class="stat-item">
                         <span class="stat-label">캠핑 빈도:</span>
                         <span class="stat-value" id="frequency-stat"></span>
-                    </div>
+            </div>
                     <div class="stat-item">
                         <span class="stat-label">주요 동반자:</span>
                         <span class="stat-value" id="companion-stat"></span>
-                    </div>
+        </div>
                     <div class="stat-item">
                         <span class="stat-label">같은 유형:</span>
                         <span class="stat-value" id="percentage-stat">전체 응답자의 약 6.25%</span>
-                    </div>
-                </div>
             </div>
-            
-                        <div class="coupon-section">
+            </div>
+        </div>
+        
+            <div class="coupon-section">
                 <div class="coupon-main-title">더 완벽한 캠핑을 위한</div>
                 <div class="coupon-title">캠핑족 전용 혜택</div>
                 
                 <div class="coupon-card" id="coupon-btn" onclick="getCoupon()">
                     <div class="coupon-content">
-                        <div class="coupon-icon">🏥️</div>
+                        <div class="coupon-icon">🏕️</div>
                         <div class="coupon-text">
                             <div class="coupon-label">캠핑 장비 할인</div>
                             <div class="coupon-value">최대 34,000원 쿠폰할인</div>
-                        </div>
+            </div>
                     </div>
                     <div class="coupon-download">↓</div>
-                </div>
-                
-                <div id="coupon-result"></div>
         </div>
-            
+
+                <div id="coupon-result"></div>
+            </div>
+
             <div class="button-group">
                 <button class="btn btn-share" onclick="shareResult()">공유하기</button>
                 <button class="btn btn-restart" onclick="restartTest()">다시 하기</button>
-            </div>
-            
+        </div>
+
             <footer class="footer">
                 <div class="footer-content">
                     © 2025 snowline. All Rights Reserved.
-                </div>
+            </div>
             </footer>
+            </div>
+        </div>
+
+    <!-- 공유용 숨겨진 컨테이너 -->
+    <div id="share-capture" style="position: absolute; left: -9999px; top: -9999px;">
+        <div class="share-container">
+            <div class="share-header">
+                <div class="share-title">나의 캠핑 스타일</div>
+                <div class="share-subtitle">심리테스트 결과</div>
+            </div>
+            <div class="result-card" id="share-result-card">
+                <div class="result-badge">CAMPING STYLE</div>
+                <div class="result-emoji" id="share-result-emoji"></div>
+                <div class="result-title" id="share-result-title"></div>
+                <div class="result-subtitle" id="share-result-subtitle"></div>
+                <div class="result-description" id="share-result-description"></div>
+        </div>
         </div>
     </div>
 
     <script>
         // Google Sheets 연동 설정
         const SHEETS_CONFIG = {
-            url: 'https://script.google.com/macros/s/AKfycbyK9AkDZ-1b4d4NwXNHnQKtLHlmDHT3_imFuJGBfy1sLDH3shbwRsW2aAE2ieriWUi7Pg/exec',
+            url: 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE',
             testSheet: '테스트결과',
             couponSheet: '쿠폰발급'
         };
@@ -984,8 +1028,8 @@
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        action: sheetType === 'test' ? 'saveTestResult' : 'saveCouponData',
-                        data: data
+                        action: sheetType === 'test' ? 'save_test_result' : 'issue_coupon',
+                        ...data
                     })
                 });
 
@@ -1119,16 +1163,12 @@
             // Google Sheets에 테스트 결과 저장
             const testData = {
                 timestamp: testStartTime.toISOString(),
-                endTime: testEndTime.toISOString(),
-                duration: testDuration,
-                resultType: resultType,
-                resultTitle: result.title,
-                answers: answers,
+                result_type: resultType,
+                result_title: result.title,
                 responses: userResponses,
-                additionalData: additionalData,
-                userAgent: navigator.userAgent,
-                screenSize: `${screen.width}x${screen.height}`,
-                language: navigator.language
+                ip_address: '',
+                user_agent: navigator.userAgent,
+                referrer: document.referrer || ''
             };
             
             await sendToGoogleSheets(testData, 'test');
@@ -1167,9 +1207,30 @@
             couponBtn.disabled = true;
             couponBtn.innerHTML = '쿠폰 발급 중<span class="loading"></span>';
             
-            setTimeout(async () => {
-                const couponCode = `CAMPING${Math.random().toString(36).substr(2, 8).toUpperCase()}`;
+            try {
                 const resultType = calculateResult();
+                
+                // Google Sheets에 쿠폰 발급 요청
+                const couponData = {
+                    result_type: resultType,
+                    ip_address: '',
+                    user_agent: navigator.userAgent
+                };
+                
+                const response = await fetch(SHEETS_CONFIG.url, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'issue_coupon',
+                        ...couponData
+                    })
+                });
+                
+                // 쿠폰 코드 생성 (서버에서 생성되지만 여기서도 표시용으로)
+                const couponCode = `CAMPING${Math.random().toString(36).substr(2, 8).toUpperCase()}`;
                 
                 couponResult.innerHTML = `
                     <div class="alert alert-success">
@@ -1180,18 +1241,16 @@
                 `;
                 couponBtn.style.display = 'none';
                 
-                // Google Sheets에 쿠폰 데이터 저장
-                const couponData = {
-                    timestamp: new Date().toISOString(),
-                    resultType: resultType,
-                    resultTitle: results[resultType].title,
-                    couponCode: couponCode,
-                    userAgent: navigator.userAgent,
-                    isUsed: false
-                };
-                
-                await sendToGoogleSheets(couponData, 'coupon');
-            }, 1500);
+            } catch (error) {
+                console.error('쿠폰 발급 실패:', error);
+                couponResult.innerHTML = `
+                    <div class="alert alert-error">
+                        쿠폰 발급에 실패했습니다. 다시 시도해주세요.
+                    </div>
+                `;
+                couponBtn.disabled = false;
+                couponBtn.innerHTML = '할인받기';
+            }
         }
 
         async function shareResult() {
@@ -1228,7 +1287,7 @@
                             // 공유가 취소되었거나 실패한 경우 이미지만 다운로드
                             downloadImage(canvas, 'camping-style-result.png');
                         }
-                    } else {
+            } else {
                         // Web Share API를 지원하지 않는 경우 (주로 데스크톱)
                         // 이미지 다운로드와 텍스트 복사 제공
                         const userChoice = confirm('이미지를 다운로드하시겠습니까?\n\n확인: 이미지 다운로드\n취소: 텍스트만 복사');
@@ -1291,8 +1350,17 @@
             
             // 쿠폰 섹션 초기화
             document.getElementById('coupon-btn').disabled = false;
-            document.getElementById('coupon-btn').innerHTML = '할인받기';
-            document.getElementById('coupon-btn').style.display = 'inline-block';
+            document.getElementById('coupon-btn').innerHTML = `
+                <div class="coupon-content">
+                    <div class="coupon-icon">🏕️</div>
+                    <div class="coupon-text">
+                        <div class="coupon-label">캠핑 장비 할인</div>
+                        <div class="coupon-value">최대 34,000원 쿠폰할인</div>
+                    </div>
+                </div>
+                <div class="coupon-download">↓</div>
+            `;
+            document.getElementById('coupon-btn').style.display = 'block';
             document.getElementById('coupon-result').innerHTML = '';
         }
 
@@ -1302,8 +1370,8 @@
             
             // Google Sheets 연결 테스트
             setTimeout(() => {
-                if (SHEETS_CONFIG.url.includes('YOUR_SCRIPT_ID')) {
-                    updateSheetsStatus('error', 'Google Scripts URL 설정 필요');
+                if (SHEETS_CONFIG.url.includes('YOUR_GOOGLE_APPS_SCRIPT_URL_HERE')) {
+                    updateSheetsStatus('error', 'Google Apps Script URL 설정 필요');
                 } else {
                     updateSheetsStatus('connected', '시트 연결 준비됨');
                 }
@@ -1328,5 +1396,3 @@
     </script>
 </body>
 </html>
-
-
