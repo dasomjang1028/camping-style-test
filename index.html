@@ -313,6 +313,14 @@
             letter-spacing: -0.01em;
             margin-bottom: 16px;
             text-align: center;
+            position: relative;
+        }
+
+        .stats-title::before {
+            content: "📊";
+            margin-right: 8px;
+            font-size: 20px;
+            display: inline-block;
         }
 
         .stats-content {
@@ -804,7 +812,7 @@
         </div>
 
             <div class="stats-section">
-                <div class="stats-title">📊 캠핑 성향 분석</div>
+                <div class="stats-title">캠핑 성향 분석</div>
                 <div class="stats-content">
                     <div class="stat-item">
                         <span class="stat-label">캠핑 빈도:</span>
@@ -872,7 +880,7 @@
     <script>
         // Google Sheets 연동 설정
         const SHEETS_CONFIG = {
-            url: 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE',
+            url: 'https://script.google.com/macros/s/AKfycbyYIneD8Sgi7mWJTRvGOnxN_BiowopOJTvhDERz21VxNLfLhImuL94UDIZUmNa6FY7ilw/exec',
             testSheet: '테스트결과',
             couponSheet: '쿠폰발급'
         };
